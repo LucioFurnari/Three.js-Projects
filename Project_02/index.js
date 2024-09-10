@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from 'jsm/controls/OrbitControls.js';
 import getStarfield from './src/getStarfield.js';
+import { getFresnelMat } from "./src/getFresnelMat.js";
 
 const w = window.innerWidth;
 const h = window.innerHeight;
@@ -36,7 +37,7 @@ earthGroup.add(earthMesh);
 // Create earth lights material and mesh
 const lightsMat = new THREE.MeshStandardMaterial( {
   map: loader.load('./textures/03_earthlights1k.jpg'),
-  blending: THREE.AdditiveBlending
+  blending: THREE.AdditiveBlending,
 });
 const lightsMesh = new THREE.Mesh(geometry, lightsMat);
 earthGroup.add(lightsMesh);
@@ -44,11 +45,19 @@ earthGroup.add(lightsMesh);
 // Create earth clouds material and mesh
 const cloudsMat = new THREE.MeshStandardMaterial({
   map: loader.load('./textures/04_earthcloudmap.jpg'),
-  blending: THREE.AdditiveBlending
+  blending: THREE.AdditiveBlending,
+  transparent: true,
+  opacity: 0.8
 });
 const cloudMesh = new THREE.Mesh(geometry, cloudsMat);
 cloudMesh.scale.setScalar(1.003);
 earthGroup.add(cloudMesh);
+
+// Add shader material
+const fresnelMat = getFresnelMat();
+const glowMesh = new THREE.Mesh(geometry, fresnelMat);
+glowMesh.scale.setScalar(1.01)
+earthGroup.add(glowMesh)
 
 // Add stars
 const stars = getStarfield({numStars: 2000});
@@ -65,7 +74,8 @@ function animate() {
 
   earthMesh.rotation.y += 0.002;
   lightsMesh.rotation.y += 0.002;
-  cloudMesh.rotation.y += 0.002;
+  cloudMesh.rotation.y += 0.0023;
+  glowMesh.rotation.y += 0.002;
   renderer.render(scene, camera);
 }
 
