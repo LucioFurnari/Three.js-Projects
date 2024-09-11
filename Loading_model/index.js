@@ -13,17 +13,35 @@ renderer.setSize(w, h);
 document.body.appendChild(renderer.domElement);
 
 
-const sunlight = new THREE.DirectionalLight();
-sunlight.position.y= 2;
-scene.add(sunlight);
+// Ambient Light
+const ambientLight = new THREE.AmbientLight(0x404040, 20);
+scene.add(ambientLight);
+
+// Directional Light
+const sunLight = new THREE.DirectionalLight(0x404040, 10);
+sunLight.castShadow = true;
+console.log(sunLight)
+scene.add(sunLight);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.update();
 
+// Add plane
+const planeMat = new THREE.MeshStandardMaterial({
+  color: 0xffffff,
+  side: THREE.DoubleSide
+});
+const planeMesh = new THREE.PlaneGeometry(10,10);
+const plane = new THREE.Mesh(planeMesh, planeMat);
+plane.rotateX(-Math.PI * 0.5);
+plane.position.y = -1
+scene.add(plane)
 
+// Add loader for 3d model (GLTF format)
 const loader = new GLTFLoader();
 loader.setPath('./assets/models/')
 loader.load('scene.gltf', (gltf) => {
+  gltf.scene.position.y = 0.2;
   scene.add(gltf.scene);
 }, undefined, (error) => {
   console.error(error)
