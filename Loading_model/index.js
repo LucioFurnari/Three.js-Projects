@@ -1,5 +1,7 @@
 import * as THREE from 'three';
-import { ObjectLoader } from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
 
 const w = window.innerWidth;
 const h = window.innerHeight;
@@ -10,26 +12,29 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(w, h);
 document.body.appendChild(renderer.domElement);
 
-const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshBasicMaterial({
-  color: 0xfffff0,
-});
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
 
 const sunlight = new THREE.DirectionalLight();
 sunlight.position.y= 2;
 scene.add(sunlight);
 
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.update();
+
+
+const loader = new GLTFLoader();
+loader.setPath('./assets/models/')
+loader.load('scene.gltf', (gltf) => {
+  scene.add(gltf.scene);
+}, undefined, (error) => {
+  console.error(error)
+})
+
 function animate() {
   requestAnimationFrame(animate);
 
-  cube.rotation.x += 0.002;
-  cube.rotation.y += 0.002;
   renderer.render(scene, camera);
 }
 animate();
-
 
 
 function handleWindowResize() {
